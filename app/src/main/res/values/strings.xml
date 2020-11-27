@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">GitHubUserListApp</string>
+    <string name="repeat_loading">repeat loading</string>
+    <string name="no_items_in_list">No items!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
