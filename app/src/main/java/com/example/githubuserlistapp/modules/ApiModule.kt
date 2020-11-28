@@ -1,8 +1,8 @@
-package com.example.githubuserlistapp
+package com.example.githubuserlistapp.modules
 
-import android.app.Activity
-import android.app.Application
-import android.os.Bundle
+import com.example.githubuserlistapp.repositories.RepositoryImpl
+import com.example.githubuserlistapp.interfaces.GitHubApi
+import com.example.githubuserlistapp.interfaces.Repository
 import dagger.Module
 import dagger.Provides
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory
@@ -24,6 +24,7 @@ class ApiModule{
             .create(GitHubApi::class.java)
     }
 
+    @Singleton
     @Provides
     fun provideRepository(api: GitHubApi): Repository {
         return RepositoryImpl(api)

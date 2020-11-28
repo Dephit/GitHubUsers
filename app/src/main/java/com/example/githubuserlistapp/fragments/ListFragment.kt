@@ -1,4 +1,4 @@
-package com.example.githubuserlistapp
+package com.example.githubuserlistapp.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.example.githubuserlistapp.R
 import kotlinx.android.synthetic.main.list_view.*
 import javax.inject.Inject
 
