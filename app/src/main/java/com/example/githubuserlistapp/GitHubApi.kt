@@ -9,5 +9,5 @@ interface GitHubApi{
     @Headers("Authorization: Bearer 5f3dad83d39a2c66f0dc5e75035878ca6564f70a")
     fun getUserList(
         @Query("since")  since: String
-    ):Observable<List<UserInList>>
+    ):Observable<List<User>>
 }

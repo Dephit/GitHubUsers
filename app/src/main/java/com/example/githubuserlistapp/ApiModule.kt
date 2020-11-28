@@ -24,4 +24,8 @@ class ApiModule{
             .create(GitHubApi::class.java)
     }
 
+    @Provides
+    fun provideRepository(api: GitHubApi): Repository {
+        return RepositoryImpl(api)
+    }
 }

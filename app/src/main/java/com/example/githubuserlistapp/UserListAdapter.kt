@@ -1,7 +1,6 @@
 package com.example.githubuserlistapp
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -12,30 +11,38 @@ import java.util.*
 
 class UserListAdapter: RecyclerView.Adapter<UserViewHolder>(){
 
-    private var userList: MutableList<UserInList> = mutableListOf()
+    private var userList: MutableList<User> = mutableListOf()
+    lateinit var fragmentCallback: FragmentCallback
 
     companion object {
-        fun initAdapter(_userList: List<UserInList> = listOf()): UserListAdapter {
+        fun initAdapter(_userList: List<User> = listOf(), fragmentCallback: FragmentCallback): UserListAdapter {
             val adapter = UserListAdapter()
             adapter.setList(_userList)
+            adapter.setCallback(fragmentCallback)
             return adapter
         }
 
-        fun initAdapter(bundle: Bundle): UserListAdapter {
+        fun initAdapter(bundle: Bundle, fragmentCallback: FragmentCallback): UserListAdapter {
             val adapter = UserListAdapter()
             val list = UserInListConverter().stringToSomeObjectList(bundle.getString("user_list"))
             list?.let { adapter.setList(it) }
+            adapter.setCallback(fragmentCallback)
             return adapter
         }
     }
 
-    fun setList(_userList: List<UserInList>){
+    private fun setCallback(_fragmentCallback: FragmentCallback) {
+        fragmentCallback = _fragmentCallback
+    }
+
+    fun setList(_userList: List<User>){
         userList = _userList.toMutableList()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         return UserViewHolder(
-            itemView = LayoutInflater.from(parent.context).inflate(R.layout.user_view, parent, false)
+            itemView = LayoutInflater.from(parent.context).inflate(R.layout.user_view, parent, false),
+            fragmentCallback = fragmentCallback
         )
     }
 
@@ -47,7 +54,7 @@ class UserListAdapter: RecyclerView.Adapter<UserViewHolder>(){
 
     fun getLastItemId(): Int? = userList.lastOrNull()?.id
 
-    fun addList(_userList: List<UserInList>) {
+    fun addList(_userList: List<User>) {
         userList.addAll(_userList)
         notifyDataSetChanged()
     }
@@ -56,16 +63,20 @@ class UserListAdapter: RecyclerView.Adapter<UserViewHolder>(){
         outState.putString("user_list", UserInListConverter().someObjectListToString(userList))
     }
 
+    fun updateUser(user: User) {
+        userList[userList.indexOfFirst { it.id == user.id }] = user
+    }
+
 }
 
 class UserInListConverter {
 
-    fun stringToSomeObjectList(d: String?): MutableList<UserInList>? {
+    fun stringToSomeObjectList(d: String?): MutableList<User>? {
         val data = d ?: return Collections.emptyList()
         if (data == "" || data == "null" || data == "[]" || data.isEmpty()) {
             return Collections.emptyList()
         }
-        val listType: Type = object : TypeToken<List<UserInList?>?>() {}.type
+        val listType: Type = object : TypeToken<List<User?>?>() {}.type
 
         return try {
             Gson().fromJson(data, listType)
@@ -74,7 +85,7 @@ class UserInListConverter {
         }
     }
 
-    fun someObjectListToString(someObjects: MutableList<UserInList>?): String? {
+    fun someObjectListToString(someObjects: MutableList<User>?): String? {
         return Gson().toJson(someObjects)
     }
 }

@@ -9,10 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import javax.inject.Inject
 
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity(), FragmentCallback{
+
     @Inject lateinit var viewModel: LoginViewModel
     @Inject lateinit var listFragment: ListFragment
 
+    override fun onUserPressed(login: String) {
+        viewModel.setUserProfile(login, listFragment.getRecyclerView()?.getLinearLayoutManager()?.findFirstVisibleItemPosition())
+    }
 
     private val recyclerViewOnScrollListener: RecyclerView.OnScrollListener =
         object : RecyclerView.OnScrollListener() {
@@ -26,6 +30,7 @@ class MainActivity : AppCompatActivity(){
     fun updateList(recyclerView: RecyclerView){
         recyclerView.getLinearLayoutManager()?.apply {
             val adapter = viewModel.getAdapter()
+            viewModel.position = findFirstVisibleItemPosition()
             if (childCount + findFirstVisibleItemPosition() >= adapter.itemCount / 2) {
                 if (!viewModel.isListRefreshed){
                     viewModel.isListRefreshed = true
@@ -39,7 +44,7 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         (applicationContext as App).appComponent.inject(this)
-        viewModel.initialize(savedInstanceState)
+        viewModel.initialize(fragmentCallback = this, savedInstanceState = savedInstanceState)
         manageState()
     }
 
@@ -49,24 +54,41 @@ class MainActivity : AppCompatActivity(){
             when(it){
                 State.LoadingState -> showLoading()
                 is State.ErrorState -> showError(it.message)
-                is State.LoadedState -> showList()
-                else -> showError(getString(R.string.no_items_in_list))
+                is State.LoadedState -> showList(it.lastPosition)
+                State.UserOpenState -> showUserProfile()
             }
         })
+    }
+
+    private fun showUserProfile() {
+        replaceFragment(UserDetailFragment.newInstance(login = ""))
+    }
+
+    override fun onBackPressed() {
+        when(viewModel.state.value){
+            State.UserOpenState -> viewModel.closeUserProfile()
+            else -> super.onBackPressed()
+        }
     }
 
     //Saves current screen state
     override fun onSaveInstanceState(outState: Bundle) {
         viewModel.saveState(outState)
-        listFragment.getRecyclerView()?.getLinearLayoutManager()?.findFirstVisibleItemPosition()?.let { outState.putInt("first_visible_position", it) }
+        //listFragment.getRecyclerView()?.getLinearLayoutManager()?.findFirstVisibleItemPosition()?.let { outState.putInt("first_visible_position", it) }
         super.onSaveInstanceState(outState)
     }
 
     //Displays user list fragment
-    private fun showList() {
+    private fun showList(lastPosition: Int?) {
         replaceFragment(listFragment)
         if(listFragment.getRecyclerView()?.adapter == null) {
             initRecyclerView()
+        }else {
+            lastPosition?.let {
+                listFragment.getRecyclerView()?.getLinearLayoutManager()?.scrollToPosition(
+                    it
+                )
+            }
         }
         if((listFragment.getRecyclerView()?.adapter as UserListAdapter).itemCount == 0){
             showError(getString(R.string.no_items_in_list))
@@ -79,6 +101,13 @@ class MainActivity : AppCompatActivity(){
                 .beginTransaction()
                 .replace(R.id.root, fragment)
                 .commitNow()
+    }
+
+    private fun addFragment(fragment: Fragment, tag: String) {
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.root, fragment, tag)
+            .commitNow()
     }
 
     //Initializing of recyclerView

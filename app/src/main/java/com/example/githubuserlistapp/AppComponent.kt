@@ -7,5 +7,5 @@ import javax.inject.Singleton
 @Component(modules = [ApiModule::class])
 interface AppComponent {
     fun inject(activity: MainActivity)
-    fun inject(activity: ListFragment)
+    fun inject(activity: UserDetailFragment)
 }
