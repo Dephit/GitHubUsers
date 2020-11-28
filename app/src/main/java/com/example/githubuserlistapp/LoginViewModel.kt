@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -14,7 +13,7 @@ import javax.inject.Inject
 sealed class State: Serializable{
     object LoadingState: State()
     class ErrorState(val message: String? = ""): State()
-    class LoadedState(val userList: List<UserInList>): State()
+    object LoadedState: State()
 }
 
 class LoginViewModel @Inject constructor(private val api: GitHubApi): ViewModel() {
@@ -32,7 +31,7 @@ class LoginViewModel @Inject constructor(private val api: GitHubApi): ViewModel(
             state.postValue(State.LoadingState)
         val a = mutableListOf<UserInList>()
         for (i in 0..40){
-            a.add(UserInList(id = i))
+            a.add(UserInList(id = i, login = "User's Login"))
         }
         val observable = Observable.just(a)
         observable
@@ -46,6 +45,7 @@ class LoginViewModel @Inject constructor(private val api: GitHubApi): ViewModel(
     }
 
     fun loadUsers(showLoader: Boolean = true, _since: Int? = since) {
+        //loadFakeUsers(showLoader, _since    )
         Log.i(USER_LOAD_TAG, "load users called")
         since = _since ?: 0
         if(showLoader)
@@ -75,7 +75,7 @@ class LoginViewModel @Inject constructor(private val api: GitHubApi): ViewModel(
             adapter.addList(it)
             isListRefreshed = false
             if(state.value !is State.LoadedState)
-                state.postValue(State.LoadedState(it))
+                state.postValue(State.LoadedState)
         }
         Log.i(USER_LOAD_TAG, "onNext")
     }
@@ -95,7 +95,8 @@ class LoginViewModel @Inject constructor(private val api: GitHubApi): ViewModel(
             since = getInt("since")
             isListRefreshed = getBoolean("is_list_refreshed")
             state.postValue(getSerializable("state") as State?)
-            onNextUserList(listOf())
+            Log.i("RESTORED_STATE", (getSerializable("state") as State?).toString())
+            //onNextUserList(listOf())
         }
     }
 

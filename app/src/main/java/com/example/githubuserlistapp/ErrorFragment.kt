@@ -25,7 +25,6 @@ class ErrorFragment : Fragment() {
     }
 
     companion object {
-
         fun newInstance(param1: String) =
             ErrorFragment().apply {
                 arguments = Bundle().apply {
@@ -35,21 +34,3 @@ class ErrorFragment : Fragment() {
     }
 }
 
-class ListFragment : Fragment() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.list_view, container, false)
-
-    }
-
-    companion object {
-        fun newInstance() = SplashFragment()
-    }
-}

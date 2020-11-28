@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 
-class SplashFragment : Fragment() {
+class LoadingFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -16,6 +16,6 @@ class SplashFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance() = SplashFragment()
+        fun newInstance() = LoadingFragment()
     }
 }
