@@ -35,9 +35,9 @@ class MainViewModel @Inject constructor(private val repository: Repository): Vie
             state.postValue(State.LoadingState)
         repository.getUserList(
             since = since.toString(),
-            onNext = { onNextUserList(it) },
-            onError = { onErrorUserList(it)},
-            onComplete = { onCompleteUserList() }
+            onNext = ::onNextUserList ,
+            onError = ::onErrorUserList,
+            onComplete = ::onCompleteUserList
         )
     }
 
@@ -88,12 +88,13 @@ class MainViewModel @Inject constructor(private val repository: Repository): Vie
     //Saving state to bundle
     fun saveState(outState: Bundle) {
         with(outState){
-            if(state.value !is State.UserOpenState)
+            if(adapter.itemCount < 100) {
                 adapter.saveToState(this)
-            putSerializable(STATE, state.value)
-            putInt(SINCE, since)
-            putBoolean(IS_LIST_REFRESHED, isListRefreshed)
-            putInt(FIRST_VISIBLE_POSITION, position)
+                putSerializable(STATE, state.value)
+                putInt(SINCE, since)
+                putBoolean(IS_LIST_REFRESHED, isListRefreshed)
+                putInt(FIRST_VISIBLE_POSITION, position)
+            }
         }
     }
 
@@ -106,7 +107,7 @@ class MainViewModel @Inject constructor(private val repository: Repository): Vie
         position = findFirstVisibleItemPosition!!
         repository.getUser(
             login = login,
-            onNext = { onUserProfileLoaded(it) },
+            onNext = ::onUserProfileLoaded,
             onError = { closeUserProfile() }
         )
     }
