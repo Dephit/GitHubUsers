@@ -6,23 +6,21 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 import java.util.*
 
-class UserInListConverter {
+class ListConverter<T> {
 
-    fun stringToSomeObjectList(d: String?): MutableList<User>? {
+    //Converts string to defined object list
+    fun stringToObjectList(d: String?): MutableList<T>? {
+        //returns empty list if passed string is null
         val data = d ?: return Collections.emptyList()
-        if (data == "" || data == "null" || data == "[]" || data.isEmpty()) {
-            return Collections.emptyList()
-        }
-        val listType: Type = object : TypeToken<List<User?>?>() {}.type
-
+        val listType: Type = object : TypeToken<List<T?>?>() {}.type
         return try {
             Gson().fromJson(data, listType)
         }catch (e:Exception){
             Collections.emptyList()
         }
     }
-
-    fun someObjectListToString(someObjects: MutableList<User>?): String? {
+    //Converts defined object list to string
+    fun objectListToString(someObjects: MutableList<T>?): String? {
         return Gson().toJson(someObjects)
     }
 }

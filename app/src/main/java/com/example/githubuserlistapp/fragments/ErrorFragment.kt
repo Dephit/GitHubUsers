@@ -9,11 +9,12 @@ import com.example.githubuserlistapp.R
 import kotlinx.android.synthetic.main.error_view.*
 
 class ErrorFragment : Fragment() {
-    private val PARAM = "param2"
+    private val PARAM = "error_text"
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         arguments?.let {
+            //if arguments not null then set error text to error text view
             error_text.text = it.getString(PARAM)
         }
     }

@@ -88,13 +88,12 @@ class MainViewModel @Inject constructor(private val repository: Repository): Vie
     //Saving state to bundle
     fun saveState(outState: Bundle) {
         with(outState){
-            if(adapter.itemCount < 100) {
+            if(adapter.itemCount < 100)
                 adapter.saveToState(this)
-                putSerializable(STATE, state.value)
-                putInt(SINCE, since)
-                putBoolean(IS_LIST_REFRESHED, isListRefreshed)
-                putInt(FIRST_VISIBLE_POSITION, position)
-            }
+            putInt(SINCE, since)
+            putBoolean(IS_LIST_REFRESHED, isListRefreshed)
+            putInt(FIRST_VISIBLE_POSITION, position)
+            putSerializable(STATE, state.value)
         }
     }
 

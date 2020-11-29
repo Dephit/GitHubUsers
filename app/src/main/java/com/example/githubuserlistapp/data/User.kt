@@ -1,7 +1,5 @@
 package com.example.githubuserlistapp.data
 
-import android.os.Parcel
-import android.os.Parcelable
 import java.io.Serializable
 
 data class User(
@@ -37,6 +35,4 @@ data class User(
     var type: String = "",
     var updated_at: String = "",
     var url: String = ""
-): Serializable{
-
-}
+): Serializable

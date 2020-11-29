@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.githubuserlistapp.R
-import com.example.githubuserlistapp.converters.UserInListConverter
+import com.example.githubuserlistapp.converters.ListConverter
 import com.example.githubuserlistapp.viewHolders.UserViewHolder
 import com.example.githubuserlistapp.data.User
 import com.example.githubuserlistapp.interfaces.FragmentCallback
@@ -26,7 +26,7 @@ class UserListAdapter: RecyclerView.Adapter<UserViewHolder>(){
         //initializing user list by bundle
         fun initAdapter(bundle: Bundle, fragmentCallback: FragmentCallback): UserListAdapter {
             val adapter = UserListAdapter()
-            val list = UserInListConverter().stringToSomeObjectList(bundle.getString(USER_LIST))
+            val list = ListConverter<User>().stringToObjectList(bundle.getString(USER_LIST))
             list?.let { adapter.setList(it) }
             adapter.setCallback(fragmentCallback)
             return adapter
@@ -51,12 +51,15 @@ class UserListAdapter: RecyclerView.Adapter<UserViewHolder>(){
         )
     }
 
+    //bind user object and view holder
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         holder.bind(userList[position])
     }
 
+    //return user list size
     override fun getItemCount(): Int = userList.size
 
+    //returns last id of user list if it's not null
     fun getLastItemId(): Int? = userList.lastOrNull()?.id
 
     //updates user list
@@ -67,7 +70,7 @@ class UserListAdapter: RecyclerView.Adapter<UserViewHolder>(){
 
     //Saves current list to bundle
     fun saveToState(outState: Bundle) {
-        outState.putString(USER_LIST, UserInListConverter().someObjectListToString(userList))
+        outState.putString(USER_LIST, ListConverter<User>().objectListToString(userList))
     }
 
     //Checks if user list is empty
