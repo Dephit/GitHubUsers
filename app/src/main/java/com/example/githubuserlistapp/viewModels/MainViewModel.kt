@@ -7,9 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.githubuserlistapp.sealedClasses.State
 import com.example.githubuserlistapp.adapters.UserListAdapter
+import com.example.githubuserlistapp.converters.ListConverter
 import com.example.githubuserlistapp.data.User
 import com.example.githubuserlistapp.interfaces.FragmentCallback
 import com.example.githubuserlistapp.interfaces.Repository
+import com.google.gson.reflect.TypeToken
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(private val repository: Repository): ViewModel() {
@@ -77,22 +79,28 @@ class MainViewModel @Inject constructor(private val repository: Repository): Vie
     //restoring view model from bundle
     private fun restoreFromInstance(fragmentCallback: FragmentCallback, savedInstanceState: Bundle) {
         with(savedInstanceState){
+            val localState = getSerializable(STATE) as State?
             adapter = UserListAdapter.initAdapter(bundle = this, fragmentCallback = fragmentCallback)
             position = getInt(FIRST_VISIBLE_POSITION, 0)
             since = getInt(SINCE, 0)
             isListRefreshed = getBoolean(IS_LIST_REFRESHED, false)
-            state.postValue(getSerializable(STATE) as State?)
+            if(localState is State.UserOpenState){
+                state.postValue(localState)
+            }else if(localState == null || localState is State.LoadingState || adapter.isEmpty()) {
+                loadUsers()
+            }else state.postValue(localState)
         }
     }
 
     //Saving state to bundle
     fun saveState(outState: Bundle) {
         with(outState){
-            if(adapter.itemCount < 100)
+            if(adapter.itemCount < 100) {
                 adapter.saveToState(this)
-            putInt(SINCE, since)
-            putBoolean(IS_LIST_REFRESHED, isListRefreshed)
-            putInt(FIRST_VISIBLE_POSITION, position)
+                putInt(SINCE, since)
+                putBoolean(IS_LIST_REFRESHED, isListRefreshed)
+                putInt(FIRST_VISIBLE_POSITION, position)
+            }
             putSerializable(STATE, state.value)
         }
     }
@@ -118,14 +126,17 @@ class MainViewModel @Inject constructor(private val repository: Repository): Vie
 
     //Closes user profile
     fun closeUserProfile() {
-        state.postValue(State.LoadedState(position))
+        if(adapter.isEmpty()){
+            loadUsers()
+        }else
+            state.postValue(State.LoadedState(position))
     }
 
     //updates current user list
     fun updateList(linearLayoutManager: LinearLayoutManager) {
         with(linearLayoutManager){
             position = findFirstVisibleItemPosition()
-            if (childCount + findFirstVisibleItemPosition() >= adapter.itemCount / 2) {
+            if (findLastVisibleItemPosition() > adapter.itemCount / 2) {
                 if (!isListRefreshed){
                     isListRefreshed = true
                     loadUsers(showLoader = false, _since = adapter.getLastItemId())

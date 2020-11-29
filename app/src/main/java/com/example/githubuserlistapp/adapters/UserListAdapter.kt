@@ -9,6 +9,7 @@ import com.example.githubuserlistapp.converters.ListConverter
 import com.example.githubuserlistapp.viewHolders.UserViewHolder
 import com.example.githubuserlistapp.data.User
 import com.example.githubuserlistapp.interfaces.FragmentCallback
+import com.google.gson.reflect.TypeToken
 
 class UserListAdapter: RecyclerView.Adapter<UserViewHolder>(){
     private var userList: MutableList<User> = mutableListOf()
@@ -26,7 +27,7 @@ class UserListAdapter: RecyclerView.Adapter<UserViewHolder>(){
         //initializing user list by bundle
         fun initAdapter(bundle: Bundle, fragmentCallback: FragmentCallback): UserListAdapter {
             val adapter = UserListAdapter()
-            val list = ListConverter<User>().stringToObjectList(bundle.getString(USER_LIST))
+            val list = ListConverter<User>().stringToObjectList(d = bundle.getString(USER_LIST), listType = object : TypeToken<List<User>>() {}.type)
             list?.let { adapter.setList(it) }
             adapter.setCallback(fragmentCallback)
             return adapter
@@ -53,7 +54,11 @@ class UserListAdapter: RecyclerView.Adapter<UserViewHolder>(){
 
     //bind user object and view holder
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        holder.bind(userList[position])
+        try {
+            holder.bind(userList[position])
+        }catch (e: Exception){
+
+        }
     }
 
     //return user list size
@@ -68,10 +73,12 @@ class UserListAdapter: RecyclerView.Adapter<UserViewHolder>(){
         notifyDataSetChanged()
     }
 
+
     //Saves current list to bundle
     fun saveToState(outState: Bundle) {
         outState.putString(USER_LIST, ListConverter<User>().objectListToString(userList))
     }
+
 
     //Checks if user list is empty
     fun isEmpty(): Boolean {

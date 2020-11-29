@@ -2,6 +2,7 @@ package com.example.githubuserlistapp.interfaces
 
 import com.example.githubuserlistapp.data.User
 import io.reactivex.rxjava3.core.Observable
+import retrofit2.Response
 import retrofit2.http.*
 
 interface GitHubApi{

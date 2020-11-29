@@ -1,5 +1,6 @@
 package com.example.githubuserlistapp.repositories
 
+import android.util.Log
 import com.example.githubuserlistapp.data.User
 import com.example.githubuserlistapp.interfaces.GitHubApi
 import com.example.githubuserlistapp.interfaces.Repository
