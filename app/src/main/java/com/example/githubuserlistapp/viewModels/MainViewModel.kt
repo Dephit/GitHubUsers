@@ -78,9 +78,9 @@ class MainViewModel @Inject constructor(private val repository: Repository): Vie
     private fun restoreFromInstance(fragmentCallback: FragmentCallback, savedInstanceState: Bundle) {
         with(savedInstanceState){
             adapter = UserListAdapter.initAdapter(bundle = this, fragmentCallback = fragmentCallback)
-            position = getInt(FIRST_VISIBLE_POSITION)
-            since = getInt(SINCE)
-            isListRefreshed = getBoolean(IS_LIST_REFRESHED)
+            position = getInt(FIRST_VISIBLE_POSITION, 0)
+            since = getInt(SINCE, 0)
+            isListRefreshed = getBoolean(IS_LIST_REFRESHED, false)
             state.postValue(getSerializable(STATE) as State?)
         }
     }
@@ -88,7 +88,8 @@ class MainViewModel @Inject constructor(private val repository: Repository): Vie
     //Saving state to bundle
     fun saveState(outState: Bundle) {
         with(outState){
-            adapter.saveToState(this)
+            if(state.value !is State.UserOpenState)
+                adapter.saveToState(this)
             putSerializable(STATE, state.value)
             putInt(SINCE, since)
             putBoolean(IS_LIST_REFRESHED, isListRefreshed)
