@@ -6,6 +6,7 @@ import com.example.githubuserlistapp.interfaces.GitHubApi
 import com.example.githubuserlistapp.interfaces.Repository
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class RepositoryImpl(private val gitHubApi: GitHubApi): Repository {
@@ -23,6 +24,24 @@ class RepositoryImpl(private val gitHubApi: GitHubApi): Repository {
                         { onError(it) },
                         { onComplete() }
                 )
+
+    }
+
+    private fun<T> callOn(observable: Single<T>,
+                          onNext: (T) -> Unit,
+                          onError: (Throwable) -> Unit
+    ){
+        observable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { t1, t2 ->
+                    if(t1 != null) {
+                        onNext(t1)
+                    } else if(t2 != null) {
+                        onError(t2)
+                    }
+                }
+
     }
 
     private fun getFakeUser(): User {
@@ -46,7 +65,7 @@ class RepositoryImpl(private val gitHubApi: GitHubApi): Repository {
         onError: (Throwable) -> Unit,
         onComplete: () -> Unit
     ) {
-        callOn(gitHubApi.getUserList(since = since), onNext, onError, onComplete)
+        callOn(gitHubApi.getUserList(since = since), onNext, onError)
     }
 
     override fun getUser(
@@ -55,6 +74,6 @@ class RepositoryImpl(private val gitHubApi: GitHubApi): Repository {
         onError: (Throwable) -> Unit,
         onComplete: () -> Unit
     ) {
-        callOn(gitHubApi.getUser(login), onNext, onError, onComplete)
+        callOn(gitHubApi.getUser(login), onNext, onError)
     }
 }

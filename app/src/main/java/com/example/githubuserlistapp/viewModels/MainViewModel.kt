@@ -136,7 +136,7 @@ class MainViewModel @Inject constructor(private val repository: Repository): Vie
     fun updateList(linearLayoutManager: LinearLayoutManager) {
         with(linearLayoutManager){
             position = findFirstVisibleItemPosition()
-            if (findLastVisibleItemPosition() > adapter.itemCount / 2) {
+            if (position > adapter.itemCount / 2) {
                 if (!isListRefreshed){
                     isListRefreshed = true
                     loadUsers(showLoader = false, _since = adapter.getLastItemId())
